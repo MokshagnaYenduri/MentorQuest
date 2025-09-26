@@ -11,7 +11,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['https://your-frontend-url.onrender.com'], // Replace with your frontend Render URL
+  origin: ['https://mentorquest.onrender.com/'], // Replace with your frontend Render URL
   credentials: true,
 }));
 app.use(express.json());
