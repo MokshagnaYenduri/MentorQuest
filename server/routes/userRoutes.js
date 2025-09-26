@@ -1,16 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middlewares/authMiddleware');
-const { createNote, getNotes, updateNote, deleteNote } = require('../controllers/userController');
+const { 
+  getDashboard,
+  getQuestions,
+  getQuestion,
+  submitSolution,
+  getProfile,
+  getLeaderboard
+} = require('../controllers/userController');
 
+// Student dashboard
+router.get('/dashboard', protect, getDashboard);
 
-router.get('/', protect, getNotes);
+// Questions
+router.get('/questions', protect, getQuestions);
+router.get('/questions/:questionId', protect, getQuestion);
+router.post('/questions/:questionId/submit', protect, submitSolution);
 
+// Profile and statistics
+router.get('/profile', protect, getProfile);
 
-router.post('/', protect, createNote);
-
-router.put('/:id', protect, updateNote);
-
-router.delete('/:id', protect, deleteNote);
+// Leaderboard
+router.get('/leaderboard', protect, getLeaderboard);
 
 module.exports = router;

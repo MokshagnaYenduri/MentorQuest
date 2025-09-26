@@ -5,15 +5,20 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role = 'student' } = req.body;
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'User already exists' });
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, email, password, role });
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
+      totalPoints: user.totalPoints || 0,
+      currentStreak: user.currentStreak || 0,
+      maxStreak: user.maxStreak || 0,
+      badges: user.badges || [],
       token: generateToken(user._id),
     });
   } catch (err) {
@@ -24,12 +29,18 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate('badges.badgeId');
     if (user && (await user.matchPassword(password))) {
       res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        totalPoints: user.totalPoints,
+        currentStreak: user.currentStreak,
+        maxStreak: user.maxStreak,
+        badges: user.badges,
         token: generateToken(user._id),
       });
     } else {
@@ -64,7 +75,12 @@ exports.googleAuth = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       avatar: user.avatar,
+      totalPoints: user.totalPoints || 0,
+      currentStreak: user.currentStreak || 0,
+      maxStreak: user.maxStreak || 0,
+      badges: user.badges || [],
       token: generateToken(user._id),
     });
   } catch (err) {

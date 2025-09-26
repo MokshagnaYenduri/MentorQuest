@@ -3,9 +3,13 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const { scheduleQuestionOfTheDay } = require('./utils/questionOfTheDay');
 
 dotenv.config();
 connectDB();
+
+// Start the question of the day scheduler
+scheduleQuestionOfTheDay();
 
 const app = express();
 app.use(express.json());
