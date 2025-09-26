@@ -1,7 +1,7 @@
 // server.js
 const express = require('express');
-const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 require('dotenv').config();
 
 // Import routes
@@ -10,26 +10,22 @@ const authRoutes = require('./routes/authRoutes');
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: ['https://mentorquest.onrender.com/'], // Replace with your frontend Render URL
-  credentials: true,
-}));
 app.use(express.json());
 
-// Routes
+// API routes
 app.use('/api/auth', authRoutes);
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.send('MentorQuest backend is running!');
+// Serve React frontend build
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+// Handle React routing, return all requests to React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
 // Connect to MongoDB
-const mongoURI = process.env.MONGO_URI; // Make sure this is set in Render environment
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+const mongoURI = process.env.MONGO_URI;
+mongoose.connect(mongoURI)
   .then(() => {
     console.log('MongoDB connected');
 
